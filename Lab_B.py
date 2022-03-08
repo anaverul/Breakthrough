@@ -13,6 +13,18 @@ class State:
     def getNumCols(self):
         return self.cols
     
+def initial_state(numRows, numCols, pieceRows): #pieceRows is an integer representing the number of rows each player has
+    emptyRows = numRows - 2*pieceRows
+    locationDict = {}
+    for i in range(pieceRows):
+        for j in range(numCols):
+            locationDict[(i, j)] = "X"
+    for i in range(numRows-1, numRows-pieceRows-1, -1):
+        for j in range(numCols):
+            locationDict[(i, j)] = "O"
+    state = State(numRows, numCols, locationDict)
+    return state
+    
 def display_state(inputState):
     if os.path.isfile("currentState.txt"):
         os.remove("currentState.txt")
