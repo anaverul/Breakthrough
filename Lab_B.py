@@ -10,7 +10,7 @@ class State:
         return self.rows
     def getNumCols(self):
         return self.cols
-def initial_state(numRows, numCols, pieceRows):
+def initial_state(numRows, numCols, pieceRows): #pieceRows is an integer representing the number of rows each player has
     emptyRows = numRows - 2*pieceRows
     locationDict = {}
     for i in range(pieceRows):
