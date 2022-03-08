@@ -12,17 +12,7 @@ class State:
         return self.rows
     def getNumCols(self):
         return self.cols
-def initial_state(numRows, numCols, pieceRows): #pieceRows is an integer representing the number of rows each player has
-    emptyRows = numRows - 2*pieceRows
-    locationDict = {}
-    for i in range(pieceRows):
-        for j in range(numCols):
-            locationDict[(i, j)] = "X"
-    for i in range(numRows-1, numRows-pieceRows-1, -1):
-        for j in range(numCols):
-            locationDict[(i, j)] = "O"
-    state = State(numRows, numCols, locationDict)
-    return state
+    
 def display_state(inputState):
     if os.path.isfile("currentState.txt"):
         os.remove("currentState.txt")
@@ -35,20 +25,23 @@ def display_state(inputState):
             else:
                 piecesFile.write(" ")
         piecesFile.write("\n")
+    print("")
     piecesFile.close()
 
 def generate_moves(currState, player):  #revised code
     players = ("X", "O")
     possibleMoves = []
     for p in currState.getPieceLocations().keys():
-        if player == "X":
-            newrow = p[0]+1 #movement will be south by one row
-        else: #if player is O
-            newrow = p[0]-1 #movement will be north by one row
         if currState.getPieceLocations()[p] == player:
-            if (newrow, p[1]) in currState.getPieceLocations().keys() and currState.getPieceLocations()[(newrow, p[1])] not in players: #pieces must be captured diagonally
-             possibleMoves.append((p, "F"))
-            elif (newrow, p[1]+1) in currState.getPieceLocations().keys() and currState.getPieceLocations()[(newrow, p[1]+1)] != player and p[1]+1 < currState.numCols: #self.numCols
+            if player == "X":
+                newrow = p[0]+1 #movement will be south by one row
+                #print(newrow)
+            else: #if player is O
+                newrow = p[0]-1 #movement will be north by one row
+            if (newrow, p[1]) not in currState.getPieceLocations().keys(): #pieces must be captured diagonally
+                possibleMoves.append((p, "F"))
+            elif (newrow, p[1]+1) in currState.getPieceLocations(
+                    ).keys() and currState.getPieceLocations()[(newrow, p[1]+1)] != player and p[1]+1 < currState.cols: #self.numCols
                 possibleMoves.append((p, "FE"))
             elif (newrow, p[1]-1) in currState.getPieceLocations().keys() and currState.getPieceLocations()[(newrow, p[1]-1)] != player and p[1]-1 > -1:
                 possibleMoves.append((p, "FW"))
@@ -67,7 +60,7 @@ def transition(currState, player, move):
     else:
         newLocations[(newrow, move[0][1]-1)] = player
     newLocations.pop(move[0])
-    return State(currState.numRows, currState.numCols, newLocations)
+    return State(currState.rows, currState.cols, newLocations)
     
 def main(numRows, numCols, pieces):
     state = initial_state(numRows, numCols, pieces)
