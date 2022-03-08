@@ -34,20 +34,39 @@ def display_state(inputState):
                 piecesFile.write(" ")
         piecesFile.write("\n")
     piecesFile.close()
-def transition(currState, player):
+
+def generate_moves(currState, player):  #revised code
+    players = ("X", "O")
+    possibleMoves = []
+    for p in currState.getPieceLocations().Keys():
+        if player == "X":
+            newrow = p[0]+1 #movement will be south by one row
+        else: #if player is O
+            newrow = p[0]-1 #movement will be north by one row
+        if p.value() == player:
+            if (newrow, p[1]) in currState.getPieceLocations().Keys() and currState.getPieceLocations()[(newrow, p[1])] not in players: #pieces must be captured diagonally
+             possibleMoves.append((p, "F"))
+            elif (newrow, p[1]+1) in currState.getPieceLocations().Keys() and currState.getPieceLocations()[(newrow, p[1]+1)] != player and p[1]+1 < currState.numCols: #self.numCols
+                possibleMoves.append((p, "FE"))
+            elif (newrow, p[1]-1) in currState.getPieceLocations().Keys() and currState.getPieceLocations()[(newrow, p[1]-1)] != player and p[1]-1 > -1:
+                possibleMoves.append((p, "FW"))
+    return possibleMoves
+    
+def transition(currState, player, move):
+    newLocations = copy.deepcopy(currState.getPieceLocations())
     if player == "X":
-        possibleMoves = ["S", "SE", "SW"]
-        for p in currState.getPieceLocations().Keys():
-            if p.value() == "X":
-                if (p[0]+1, p[1]) in currState.getPieceLocations().Keys() and currState.getPieceLocations()[(p[0]+1, p[1])] != "X":
-                    currState.getPieceLocations()[(p[0]+1, p[1])] == "X"
-                    currState.pieceLocations().pop(p)
-                elif (p[0]+1, p[1]+1) in currState.getPieceLocations().Keys() and currState.getPieceLocations()[(p[0]+1, p[1]+1)] != "X":
-                    currState.getPieceLocations()[(p[0]+1, p[1]+1)] == "X"
-                    currState.pieceLocations().pop(p)
-                elif (p[0]+1, p[1]-1) in currState.getPieceLocations().Keys() and currState.getPieceLocations()[(p[0]+1, p[1]-1)] != "X":
-                    currState.getPieceLocations()[(p[0]+1, p[1]-1)] == "X"
-                    currState.pieceLocations().pop(p)
+        newrow = p[0]+1 #movement will be south by one row
+	else: #if player is O
+        newrow = p[0]-1 #movement will be north by one row
+    if move[1] == "F":
+        newLocations[(newrow, move[0][1])] = player
+    elif move[1] == "FE":
+        newLocations[(newrow, move[0][1]+1)] = player
+    else:
+        newLocations[(newrow, move[0][1]-1)] = player
+    newLocations.pop(move[0])
+	return State(currState.numRows, currState.numCols, newLocations)
+    
 def main(numRows, numCols, pieces):
     state = initial_state(numRows, numCols, pieces)
     display_state(state)
