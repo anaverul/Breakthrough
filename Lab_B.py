@@ -1,4 +1,6 @@
 import os
+import copy
+
 class State:
     def __init__(self,rows,cols,pieceLocations):
         self.rows = rows
@@ -16,7 +18,7 @@ def initial_state(numRows, numCols, pieceRows): #pieceRows is an integer represe
     for i in range(pieceRows):
         for j in range(numCols):
             locationDict[(i, j)] = "X"
-    for i in range(numRows, numRows-pieceRows, -1):
+    for i in range(numRows-1, numRows-pieceRows-1, -1):
         for j in range(numCols):
             locationDict[(i, j)] = "O"
     state = State(numRows, numCols, locationDict)
@@ -55,9 +57,9 @@ def generate_moves(currState, player):  #revised code
 def transition(currState, player, move):
     newLocations = copy.deepcopy(currState.getPieceLocations())
     if player == "X":
-        newrow = p[0]+1 #movement will be south by one row
-	else: #if player is O
-        newrow = p[0]-1 #movement will be north by one row
+        newrow = move[0][0]+1 #movement will be south by one row
+    else: #if player is O
+        newrow = move[0][0]-1 #movement will be north by one row
     if move[1] == "F":
         newLocations[(newrow, move[0][1])] = player
     elif move[1] == "FE":
@@ -65,7 +67,7 @@ def transition(currState, player, move):
     else:
         newLocations[(newrow, move[0][1]-1)] = player
     newLocations.pop(move[0])
-	return State(currState.numRows, currState.numCols, newLocations)
+    return State(currState.numRows, currState.numCols, newLocations)
     
 def main(numRows, numCols, pieces):
     state = initial_state(numRows, numCols, pieces)
