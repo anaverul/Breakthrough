@@ -28,7 +28,7 @@ def display_state(inputState):
         os.remove("currentState.txt")
     pieces = inputState.getPieceLocations()
     piecesFile = open("currentState.txt", 'a')
-    for r in range(inputState.getNumRows()+1):
+    for r in range(inputState.getNumRows()):
         for c in range(inputState.getNumCols()):
             if (r,c) in inputState.getPieceLocations():
                 piecesFile.write(inputState.getPieceLocations()[r,c])
