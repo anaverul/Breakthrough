@@ -1,4 +1,6 @@
 import os
+import copy
+
 class State:
     def __init__(self,rows,cols,pieceLocations):
         self.rows = rows
@@ -10,49 +12,81 @@ class State:
         return self.rows
     def getNumCols(self):
         return self.cols
+    
 def initial_state(numRows, numCols, pieceRows): #pieceRows is an integer representing the number of rows each player has
     emptyRows = numRows - 2*pieceRows
     locationDict = {}
     for i in range(pieceRows):
         for j in range(numCols):
             locationDict[(i, j)] = "X"
-    for i in range(numRows, numRows-pieceRows, -1):
+    for i in range(numRows-1, numRows-pieceRows-1, -1):
         for j in range(numCols):
             locationDict[(i, j)] = "O"
     state = State(numRows, numCols, locationDict)
     return state
+    
 def display_state(inputState):
     if os.path.isfile("currentState.txt"):
         os.remove("currentState.txt")
     pieces = inputState.getPieceLocations()
     piecesFile = open("currentState.txt", 'a')
-    for r in range(inputState.getNumRows()+1):
+    for r in range(inputState.getNumRows()):
         for c in range(inputState.getNumCols()):
             if (r,c) in inputState.getPieceLocations():
                 piecesFile.write(inputState.getPieceLocations()[r,c])
             else:
                 piecesFile.write(" ")
         piecesFile.write("\n")
+    print("")
     piecesFile.close()
-def transition(currState, player):
+
+def generate_moves(currState, player):  #revised code
+    players = ("X", "O")
+    possibleMoves = []
+    for p in currState.getPieceLocations().keys():
+        if currState.getPieceLocations()[p] == player:
+            if player == "X":
+                newrow = p[0]+1 #movement will be south by one row
+                #print(newrow)
+            else: #if player is O
+                newrow = p[0]-1 #movement will be north by one row
+            if (newrow, p[1]) not in currState.getPieceLocations().keys(): #pieces must be captured diagonally
+                possibleMoves.append((p, "F"))
+            elif (newrow, p[1]+1) in currState.getPieceLocations(
+                    ).keys() and currState.getPieceLocations()[(newrow, p[1]+1)] != player and p[1]+1 < currState.cols: #self.numCols
+                possibleMoves.append((p, "FE"))
+            elif (newrow, p[1]-1) in currState.getPieceLocations().keys() and currState.getPieceLocations()[(newrow, p[1]-1)] != player and p[1]-1 > -1:
+                possibleMoves.append((p, "FW"))
+    return possibleMoves
+    
+def transition(currState, player, move):
+    newLocations = copy.deepcopy(currState.getPieceLocations())
     if player == "X":
-        possibleMoves = ["S", "SE", "SW"]
-        for p in currState.getPieceLocations().Keys():
-            if p.value() == "X":
-                if (p[0]+1, p[1]) in currState.getPieceLocations().Keys() and currState.getPieceLocations()[(p[0]+1, p[1])] != "X":
-                    currState.getPieceLocations()[(p[0]+1, p[1])] == "X"
-                    currState.pieceLocations().pop(p)
-                elif (p[0]+1, p[1]+1) in currState.getPieceLocations().Keys() and currState.getPieceLocations()[(p[0]+1, p[1]+1)] != "X":
-                    currState.getPieceLocations()[(p[0]+1, p[1]+1)] == "X"
-                    currState.pieceLocations().pop(p)
-                elif (p[0]+1, p[1]-1) in currState.getPieceLocations().Keys() and currState.getPieceLocations()[(p[0]+1, p[1]-1)] != "X":
-                    currState.getPieceLocations()[(p[0]+1, p[1]-1)] == "X"
-                    currState.pieceLocations().pop(p)
+        newrow = move[0][0]+1 #movement will be south by one row
+    else: #if player is O
+        newrow = move[0][0]-1 #movement will be north by one row
+    if move[1] == "F":
+        newLocations[(newrow, move[0][1])] = player
+    elif move[1] == "FE":
+        newLocations[(newrow, move[0][1]+1)] = player
+    else:
+        newLocations[(newrow, move[0][1]-1)] = player
+    newLocations.pop(move[0])
+    return State(currState.rows, currState.cols, newLocations)
+    
 def main(numRows, numCols, pieces):
     state = initial_state(numRows, numCols, pieces)
     display_state(state)
     piecesFile = open("currentState.txt", 'r')
-    print(piecesFile.read())
+    print(piecesFile.read(), end="")
+    piecesFile.close()
+    moves = generate_moves(state, "X")
+    for move in moves:
+        display_state(transition(state, "X", move))
+        piecesFile = open("currentState.txt", 'r')
+        print(piecesFile.read(), end="")
+        piecesFile.close()
+        
 if __name__ == "__main__":
         import argparse
         parser = argparse.ArgumentParser(description='Breakthrough')
