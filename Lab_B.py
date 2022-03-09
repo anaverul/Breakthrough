@@ -105,7 +105,7 @@ def main(numRows, numCols, pieces):
     print(piecesFile.read(), end="")
     piecesFile.close()
     moves = generate_moves(state, "X")
-    print("Possible Moves:\n")
+    print("\nPossible Moves for X:")
     for move in moves:
         display_state(transition(state, "X", move))
         piecesFile = open("currentState.txt", 'r')
