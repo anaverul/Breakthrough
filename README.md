@@ -9,14 +9,40 @@ Implementation of some initial functions needed for AIs competing in a game of B
 
 ## How to use:
 
-* On the CLI: navigate to the directory containing Lab_B.py and type ```$python3 Lab_B.py -r 5 -c 4 -p 2```. r, c and p refer to the number of rows, columns, and piece rows in that order. Make sure to replace 5, 4 and 2 with integers of choice.
+* On the CLI: navigate to the directory containing Lab_B.py and type ```$python3 Lab_B.py -r 5 -c 2 -p 2```. r, c and p refer to the number of rows, columns, and piece rows in that order. Make sure to replace 5, 2 and 2 with integers of choice.
 
 
 ### example output:
 ```
-XXXX
-XXXX
+XX
+XX
+--
+OO
+OO
 
-OOOO
-OOOO
+Possible Moves for X:
+
+XX
+-X
+X-
+OO
+OO
+
+XX
+-X
+-X
+OO
+OO
+
+XX
+X-
+-X
+OO
+OO
+
+XX
+X-
+X-
+OO
+OO
 ```
