@@ -41,7 +41,7 @@ def display_state(inputState):
             if (r,c) in inputState.getPieceLocations():
                 piecesFile.write(inputState.getPieceLocations()[r,c])
             else:
-                piecesFile.write(" ")
+                piecesFile.write("-")
         piecesFile.write("\n")
     print("")
     piecesFile.close()
@@ -105,6 +105,7 @@ def main(numRows, numCols, pieces):
     print(piecesFile.read(), end="")
     piecesFile.close()
     moves = generate_moves(state, "X")
+    print("Possible Moves:\n")
     for move in moves:
         display_state(transition(state, "X", move))
         piecesFile = open("currentState.txt", 'r')
