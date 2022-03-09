@@ -87,6 +87,16 @@ def transition(currState, player, move):
         newLocations[(newrow, move[0][1]-1)] = player
     newLocations.pop(move[0])
     return State(currState.rows, currState.cols, newLocations)
+
+def isTerminal(boardState):
+    terminal = False
+    for key, value in boardState.getPieceLocations().items():
+        if value == "X" and key[0] == boardState.getNumCols()-1:
+                terminal = True
+        else:
+            if value == "O" and key[0] == 0:
+                terminal = True
+    return terminal    
     
 def main(numRows, numCols, pieces):
     state = initial_state(numRows, numCols, pieces)
