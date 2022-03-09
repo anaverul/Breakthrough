@@ -91,7 +91,7 @@ def transition(currState, player, move):
 def isTerminal(boardState):
     terminal = False
     for key, value in boardState.getPieceLocations().items():
-        if value == "X" and key[0] == boardState.getNumCols()-1:
+        if value == "X" and key[0] == boardState.getNumRows()-1:
                 terminal = True
         else:
             if value == "O" and key[0] == 0:
