@@ -1,3 +1,9 @@
+"""
+Andy Strozewski, Ana Verulidze, and Katrina Ziebarth
+CS 365 Lab B
+andystrozewski-anaverulidze-katrinaziebarth-labB.py
+"""
+
 import os
 import copy
 
