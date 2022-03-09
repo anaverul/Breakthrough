@@ -52,11 +52,19 @@ def generate_moves(currState, player):  #revised code
                 newrow = p[0]-1 #movement will be north by one row
             if (newrow, p[1]) not in currState.getPieceLocations().keys(): #pieces must be captured diagonally
                 possibleMoves.append((p, "F"))
-            elif (newrow, p[1]+1) in currState.getPieceLocations(
-                    ).keys() and currState.getPieceLocations()[(newrow, p[1]+1)] != player and p[1]+1 < currState.cols: #self.numCols
-                possibleMoves.append((p, "FE"))
-            elif (newrow, p[1]-1) in currState.getPieceLocations().keys() and currState.getPieceLocations()[(newrow, p[1]-1)] != player and p[1]-1 > -1:
-                possibleMoves.append((p, "FW"))
+            if (newrow, p[1]+1) not in currState.getPieceLocations().keys(
+                    ):
+                if p[1]+1 < currState.cols:
+                    possibleMoves.append((p, "FE"))
+            else:
+                if currState.getPieceLocations()[(newrow, p[1]+1)] != player:
+                    possibleMoves.append((p, "FE"))#self.numCols
+            if (newrow, p[1]-1) not in currState.getPieceLocations().keys():
+                if p[1]-1 > -1:
+                    possibleMoves.append((p, "FW"))
+            else:
+                if currState.getPieceLocations()[(newrow, p[1]-1)] != player:
+                    possibleMoves.append((p, "FW"))       
     return possibleMoves
     
 def transition(currState, player, move):
