@@ -147,25 +147,33 @@ def recursive_traversal(root, maxDepth):
                     
 def return_desirable_move(boardState, player):
     currDepth = 0
-    maxDepth = 3
+    maxDepth = 2
     stack = []
     root = Node(None, boardState, 0)
     currNode = root
-    while currNode.depth < maxDepth:
+    stack.append(root)
+    while stack:
+        currNode = stack.pop()
         currDepth = currNode.depth
         for move in generate_moves(currNode.boardState, player):
             newState = transition(currNode.boardState, player, move)
             newNode = Node(move, newState, currDepth+1)
-            stack.append(newNode)
             currNode.children.append(newNode)
             if newNode.depth == maxDepth:
                 newNode.utility = utility_evasive(newNode.boardState, player)
-        currNode = stack.pop()
+            else:
+                stack.append(newNode)
+        #print(currDepth)
+        #print(len(currNode.children))
+        #print(len(stack))
+        #currNode = stack.pop()
     rootUtility = recursive_traversal(root, maxDepth)
+    #print("length of child list is: " + str(len(root.children)))
     for child in root.children:
-        print(child.utility)
+        print('Child Utility ' + str(child.utility))
         if child.utility == rootUtility:
-            return child.action
+            action = child.action
+    return action      
     
 def main(numRows, numCols, pieces):
     state = initial_state(numRows, numCols, pieces)
