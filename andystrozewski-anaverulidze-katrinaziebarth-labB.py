@@ -97,9 +97,80 @@ def isTerminal(boardState):
             if value == "O" and key[0] == 0:
                 terminal = True
     return terminal    
+
+def utility_evasive(boardState, player):
+    numPieces = 0
+    for value in boardState.getPieceLocations().values():
+        if value == player:
+            numPieces += 1
+    return numPieces + random.random()
+
+def utility_conquerer(boardState, player):
+    numOppPieces = 0
+    for value in boardState.getPieceLocations().values():
+        if value != player:
+            numOppPieces += 1
+    return 0 - numOppPieces + random.random()
+
+class Node:
+    def __init__(self, action, boardState, depth):
+        self.children = []
+        self.action = action
+        self.boardState = boardState
+        self.depth = depth
+        self.utility = None
+
+def recursive_traversal(root, maxDepth):
+    if not root.utility:
+        if root.depth % 2 == 0:
+            maxValue = 0
+            for child in root.children:
+                childUtility = recursive_traversal(child, maxDepth)
+                print(root.depth + 1)
+                print("Child Utility: " + str(childUtility))
+                print("MaxValue: " + str(maxValue))
+                if childUtility > maxValue:
+                    maxValue = childUtility
+                    print("MaxValue: " + str(maxValue))
+            root.utility = maxValue
+        else:
+            minValue = float('inf')
+            for child in root.children:
+                childUtility = recursive_traversal(child, maxDepth)
+                #print("Child Utility: " + str(childUtility))
+                #print("MinValue: " + str(minValue))
+                if childUtility < minValue:
+                    minValue = childUtility
+                    #print("MinValue: " + str(minValue))
+            root.utility = minValue
+    return root.utility
+                    
+def return_desirable_move(boardState, player):
+    currDepth = 0
+    maxDepth = 3
+    stack = []
+    root = Node(None, boardState, 0)
+    currNode = root
+    while currNode.depth < maxDepth:
+        currDepth = currNode.depth
+        for move in generate_moves(currNode.boardState, player):
+            newState = transition(currNode.boardState, player, move)
+            newNode = Node(move, newState, currDepth+1)
+            stack.append(newNode)
+            currNode.children.append(newNode)
+            if newNode.depth == maxDepth:
+                newNode.utility = utility_evasive(newNode.boardState, player)
+        currNode = stack.pop()
+    rootUtility = recursive_traversal(root, maxDepth)
+    for child in root.children:
+        print(child.utility)
+        if child.utility == rootUtility:
+            return child.action
     
 def main(numRows, numCols, pieces):
     state = initial_state(numRows, numCols, pieces)
+    print(return_desirable_move(state, "O"))
+    """
     display_state(state)
     piecesFile = open("currentState.txt", 'r')
     print(piecesFile.read(), end="")
@@ -111,6 +182,7 @@ def main(numRows, numCols, pieces):
         piecesFile = open("currentState.txt", 'r')
         print(piecesFile.read(), end="")
         piecesFile.close()
+    """
         
 if __name__ == "__main__":
         import argparse
