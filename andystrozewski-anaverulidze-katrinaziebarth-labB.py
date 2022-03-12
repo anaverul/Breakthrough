@@ -6,6 +6,7 @@ andystrozewski-anaverulidze-katrinaziebarth-labB.py
 
 import os
 import copy
+import random
 
 class State:
     def __init__(self,rows,cols,pieceLocations):
