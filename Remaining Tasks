@@ -1,0 +1,7 @@
+Write play_game function (recording numbers of pieces captured and total number of moves, and making it possible to choose utility functions from the terminal)
+store number of rows and number of cols in a separate object, rather than in each state, and rework code to work with that structure
+play out multiple games between conquerer and evasive
+name new utility functions
+make sure new functions can beat evasive and conquerer at least 80% of the time
+write instructions in readme
+describe functions in report (particularly champion function)
