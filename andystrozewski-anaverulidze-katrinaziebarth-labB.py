@@ -52,36 +52,38 @@ def display_state(inputState, board):
         piecesFile.write("\n")
     print("")
     piecesFile.close()
+    piecesFile = open("currentState.txt", 'r')
+    print(piecesFile.read(), end="")
+    piecesFile.close()
 
 def generate_moves(currState, board, player):  #revised code
-    players = ("X", "O")
     possibleMoves = []
-    for p in currState.getPieceLocations().keys():
-        if currState.getPieceLocations()[p] == player:
+    for p in currState.pieceLocations.keys():
+        if currState.pieceLocations[p] == player:
             if player == "X":
                 newrow = p[0]+1 #movement will be south by one row
                 #print(newrow)
             else: #if player is O
                 newrow = p[0]-1 #movement will be north by one row
-            if (newrow, p[1]) not in currState.getPieceLocations().keys(): #pieces must be captured diagonally
+            if (newrow, p[1]) not in currState.pieceLocations.keys(): #pieces must be captured diagonally
                 possibleMoves.append((p, "F"))
-            if (newrow, p[1]+1) not in currState.getPieceLocations().keys(
+            if (newrow, p[1]+1) not in currState.pieceLocations.keys(
                     ):
                 if p[1]+1 < board.cols:
                     possibleMoves.append((p, "FE"))
             else:
                 if currState.getPieceLocations()[(newrow, p[1]+1)] != player:
                     possibleMoves.append((p, "FE"))#self.numCols
-            if (newrow, p[1]-1) not in currState.getPieceLocations().keys():
+            if (newrow, p[1]-1) not in currState.pieceLocations.keys():
                 if p[1]-1 > -1:
                     possibleMoves.append((p, "FW"))
             else:
-                if currState.getPieceLocations()[(newrow, p[1]-1)] != player:
+                if currState.pieceLocations[(newrow, p[1]-1)] != player:
                     possibleMoves.append((p, "FW"))       
     return possibleMoves
     
 def transition(currState, player, move):
-    newLocations = copy.deepcopy(currState.getPieceLocations())
+    newLocations = copy.deepcopy(currState.pieceLocations)
     if player == "X":
         newrow = move[0][0]+1 #movement will be south by one row
     else: #if player is O
@@ -97,7 +99,7 @@ def transition(currState, player, move):
 
 def isTerminal(boardState, board):
     terminal = False
-    for key, value in boardState.getPieceLocations().items():
+    for key, value in boardState.pieceLocations.items():
         if value == "X" and key[0] == board.getNumRows()-1:
                 terminal = True
         else:
@@ -107,17 +109,23 @@ def isTerminal(boardState, board):
 
 def utility_evasive(boardState, board, player):
     numPieces = 0
-    for value in boardState.getPieceLocations().values():
+    for value in boardState.pieceLocations.values():
         if value == player:
             numPieces += 1
     return numPieces + random.random()
 
 def utility_conquerer(boardState, board, player):
     numOppPieces = 0
-    for value in boardState.getPieceLocations().values():
+    for value in boardState.pieceLocations.values():
         if value != player:
             numOppPieces += 1
     return 0 - numOppPieces + random.random()
+
+def get_utility(boardState, board, player, utility):
+    if utility == 'evasive':
+        return utility_evasive(boardState, board, player)
+    elif utility == 'conquerer':
+        return utility_conquerer(boardState, board, player)
 
 class Node:
     def __init__(self, action, boardState, depth):
@@ -152,9 +160,9 @@ def recursive_traversal(root, maxDepth):
             root.utility = minValue
     return root.utility
                     
-def return_desirable_move(boardState, board, player):
+def return_desirable_move(boardState, board, utility, player):
     currDepth = 0
-    maxDepth = 3
+    maxDepth = 4
     stack = []
     root = Node(None, boardState, 0)
     currNode = root
@@ -167,7 +175,7 @@ def return_desirable_move(boardState, board, player):
             newNode = Node(move, newState, currDepth+1)
             currNode.children.append(newNode)
             if newNode.depth == maxDepth:
-                newNode.utility = utility_evasive(newNode.boardState, board, player)
+                newNode.utility = get_utility(utility, newNode.boardState, board, player)
             else:
                 stack.append(newNode)
         #print(currDepth)
@@ -180,11 +188,37 @@ def return_desirable_move(boardState, board, player):
         #print('Child Utility ' + str(child.utility))
         if child.utility == rootUtility:
             action = child.action
-    return action      
+    return action
+
+def play_game(heuristicX, heuristicO, boardState, board):
+    total_moves = 0
+    while not isTerminal(boardState, board):
+        nextMoveO = return_desirable_move(boardState, board, heuristicO, "O")
+        boardState = transition(boardState, "O", nextMoveO)
+        total_moves += 1
+        if isTerminal(boardState, board):
+            break
+        nextMoveX = return_desirable_move(boardState, board, heuristicX, "X")
+        boardState = transition(boardState, "X", nextMoveX)    
+        total_moves += 1
+    display_state(boardState, board)
+    print("Total moves: " + str(total_moves))
+    original_count = board.cols * board.pieceRows
+    x_pieces = 0
+    o_pieces = 0
+    for key, value in boardState.getPieceLocations().items():
+        if value == 'X':
+            x_pieces += 1
+        else:
+            o_pieces += 1
+    print("Number of X Pieces Captured: " + str(original_count - x_pieces))
+    print("Number of O Pieces Captured: " + str(original_count - o_pieces))
     
-def main(numRows, numCols, pieces):
+    
+    
+def main(numRows, numCols, pieces, x_heuristic, o_heuristic):
     state, board = initial_state_and_board(numRows, numCols, pieces)
-    print(return_desirable_move(state, board, "O"))
+    play_game(x_heuristic, o_heuristic, state, board)
     """
     display_state(state)
     piecesFile = open("currentState.txt", 'r')
@@ -205,5 +239,8 @@ if __name__ == "__main__":
         parser.add_argument('-r', '--rows', type = int, required = True)
         parser.add_argument('-c', '--cols', type = int, required = True)
         parser.add_argument('-p', '--pieces' , type = int, required = True)
+        parser.add_argument('-w', '--white_heuristic', type = str, required = True)
+        parser.add_argument('-b', '--black_heuristic' , type = str, required = True)
         args = parser.parse_args()
-        main(args.rows, args.cols, args.pieces)
+        main(args.rows, args.cols, args.pieces, args.white_heuristic, args.black_heuristic)
+        
