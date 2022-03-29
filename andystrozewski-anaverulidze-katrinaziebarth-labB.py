@@ -171,7 +171,7 @@ def return_desirable_move(boardState, player):
     rootUtility = recursive_traversal(root, maxDepth)
     #print("length of child list is: " + str(len(root.children)))
     for child in root.children:
-        print('Child Utility ' + str(child.utility))
+        #print('Child Utility ' + str(child.utility))
         if child.utility == rootUtility:
             action = child.action
     return action      
