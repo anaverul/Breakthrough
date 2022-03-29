@@ -121,7 +121,7 @@ def utility_conquerer(boardState, board, player):
             numOppPieces += 1
     return 0 - numOppPieces + random.random()
 
-def get_utility(boardState, board, player, utility):
+def get_utility(utility, boardState, board, player):
     if utility == 'evasive':
         return utility_evasive(boardState, board, player)
     elif utility == 'conquerer':
