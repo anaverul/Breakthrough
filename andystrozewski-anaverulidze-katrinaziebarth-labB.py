@@ -127,12 +127,12 @@ def recursive_traversal(root, maxDepth):
             maxValue = 0
             for child in root.children:
                 childUtility = recursive_traversal(child, maxDepth)
-                print(root.depth + 1)
-                print("Child Utility: " + str(childUtility))
-                print("MaxValue: " + str(maxValue))
+                #print(root.depth + 1)
+                #print("Child Utility: " + str(childUtility))
+                #print("MaxValue: " + str(maxValue))
                 if childUtility > maxValue:
                     maxValue = childUtility
-                    print("MaxValue: " + str(maxValue))
+                    #print("MaxValue: " + str(maxValue))
             root.utility = maxValue
         else:
             minValue = float('inf')
