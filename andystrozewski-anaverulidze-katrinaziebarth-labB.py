@@ -120,13 +120,13 @@ def utility_conquerer(boardState, board, player):
         if value != player:
             numOppPieces += 1
     return 0 - numOppPieces + random.random()
-
+        
 def utility_defensive(boardState, board, player):
 #average of squares until opponent reaches our edge
 #number of pieces we have left
 #we want both of these values to be high, that's why we consider them together
     numPieces = 0
-    numSquares = 0
+    numOpPieces = 0
     totalSquares = 0
     if player == "X":
         edge = 0
@@ -136,10 +136,10 @@ def utility_defensive(boardState, board, player):
         if value == player:
             numPieces += 1
         else:
+            numOpPieces += 1
             distance = abs(key[0] - edge)
-            numSquares += 1
             totalSquares += distance
-    averageSquares = totalSquares/numSquares
+    averageSquares = totalSquares/numOpPieces
     return (numPieces + random.random() + averageSquares)
 
 def utility_offensive(boardState, board, player):
@@ -147,7 +147,7 @@ def utility_offensive(boardState, board, player):
 #number of pieces our opponent has left
 #we want both of these values to be low, that's why we consider them together
     numPieces = 0
-    numSquares = 0
+    numOpPieces = 0
     totalSquares = 0
     if player == "X":
         edge = board.getNumRows()-1
@@ -155,12 +155,12 @@ def utility_offensive(boardState, board, player):
         edge= 0
     for key, value in boardState.getPieceLocations().items():
         if value != player:
-            numPieces += 1
+            numOpPieces += 1
         else:
+            numPieces += 1
             distance = abs(key[0] - edge)
-            numSquares += 1
             totalSquares += distance
-    averageSquares = totalSquares/numSquares
+    averageSquares = totalSquares/numPieces
     return (0 -numPieces - random.random() - averageSquares)
 
 def get_utility(utility, boardState, board, player):
