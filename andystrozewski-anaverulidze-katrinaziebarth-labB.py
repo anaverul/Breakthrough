@@ -114,6 +114,7 @@ def checkVictor(boardState, board):
         else:
             if value == "O" and key[0] == 0:
                 return "O"
+    return None
 
 def utility_evasive(boardState, board, player):
     numPieces = 0
@@ -241,6 +242,8 @@ def return_desirable_move(boardState, board, utility, player):
                 newNode.utility = get_utility(utility, newNode.boardState, board, player)
             else:
                 stack.append(newNode)
+        if not currNode.children:
+            currNode.utility = get_utility(utility, currNode.boardState, board, player)
         #print(currDepth)
         #print(len(currNode.children))
         #print(len(stack))
@@ -251,25 +254,35 @@ def return_desirable_move(boardState, board, utility, player):
         #print('Child Utility ' + str(child.utility))
         if child.utility == rootUtility:
             action = child.action
-    return action
+            return action
+    if not root.children:
+        return None
 
 def play_game(heuristicO, heuristicX, boardState, board):
     total_moves = 0
     while not isTerminal(boardState, board):
         nextMoveO = return_desirable_move(boardState, board, heuristicO, "O")
-        boardState = transition(boardState, "O", nextMoveO)
-        total_moves += 1
-        if isTerminal(boardState, board):
+        if nextMoveO:
+            boardState = transition(boardState, "O", nextMoveO)
+            total_moves += 1
+            if isTerminal(boardState, board):
+                break
+        else:
             break
         nextMoveX = return_desirable_move(boardState, board, heuristicX, "X")
-        boardState = transition(boardState, "X", nextMoveX)    
-        total_moves += 1
+        if nextMoveX:
+            boardState = transition(boardState, "X", nextMoveX)    
+            total_moves += 1
+        else:
+            break
     display_state(boardState, board)
     victor = checkVictor(boardState, board)
     if victor == "X":
         print("Black (X) was the winner.")
-    else:
+    elif victor == "O":
         print("White (O) was the winner.")
+    else:
+        print("Draw")
     print("Total moves: " + str(total_moves))
     original_count = board.cols * board.pieceRows
     x_pieces = 0
@@ -298,7 +311,7 @@ def run_test(numRows, numCols, pieces, o_heuristic, x_heuristic, run_number):
         victor, total_moves, w_captured, b_captured = play_game(o_heuristic, x_heuristic, state, board)
         if victor == "O":
             o_vict += 1
-        else:
+        elif victor == "X":
             x_vict += 1
         moves += total_moves
         w_count += w_captured
