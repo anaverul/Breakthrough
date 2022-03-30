@@ -269,24 +269,36 @@ def play_game(heuristicO, heuristicX, boardState, board):
     print("Number of White Pieces Captured (O): " + str(original_count - o_pieces))
     print("Number of Black Pieces Captured (X): " + str(original_count - x_pieces))
     
-    
-    
 def main(numRows, numCols, pieces, o_heuristic, x_heuristic):
     state, board = initial_state_and_board(numRows, numCols, pieces)
     play_game(o_heuristic, x_heuristic, state, board)
-    """
-    display_state(state)
-    piecesFile = open("currentState.txt", 'r')
-    print(piecesFile.read(), end="")
-    piecesFile.close()
-    moves = generate_moves(state, "X")
-    print("\nPossible Moves for X:")
-    for move in moves:
-        display_state(transition(state, "X", move))
-        piecesFile = open("currentState.txt", 'r')
-        print(piecesFile.read(), end="")
-        piecesFile.close()
-    """
+
+def run_test(numRows, numCols, pieces, o_heuristic, x_heuristic, run_number):
+    state, board = initial_state_and_board(numRows, numCols, pieces)
+    moves = 0
+    w_count = 0
+    b_count = 0
+    for i in range(run_number):
+        total_moves, w_captured, b_captured = play_game(o_heuristic, x_heuristic, state, board)
+        moves += total_moves
+        w_count += w_captured
+        b_count += b_captured
+    if os.path.isfile("statistics.txt"):
+        os.remove("statistics.txt")
+    statsFile = open("statistics.txt", 'a')
+    statsFile.write("White Heuristic: " + o_heuristic)
+    statsFile.write("Black Heuristic: " + x_heuristic)
+    if board.pieceRows > 1:
+        statsFile.write(str(board.cols) + " x " + str(board.rows) + ", " + str(board.pieceRows) + " rows of pieces")
+    else:
+        statsFile.write(str(board.cols) + " x " + str(board.rows) + ", " + str(board.pieceRows) + " row of pieces")
+    statsFile.write("Average Total Moves: " + str(moves / run_number))
+    statsFile.write("Average Number of White Pieces Captured: " + str(w_count / run_number))
+    statsFile.write("Average Number of Black Pieces Captured: " + str(b_count / run_number))
+    statsFile.close()
+    statsFile = open("statistics.txt", 'r')
+    print(statsFile.read(), end="")
+    statsFile.close()
         
 if __name__ == "__main__":
         import argparse
@@ -296,6 +308,11 @@ if __name__ == "__main__":
         parser.add_argument('-p', '--pieces' , type = int, required = True)
         parser.add_argument('-w', '--white_heuristic', type = str, required = True)
         parser.add_argument('-b', '--black_heuristic' , type = str, required = True)
+        parser.add_argument('-t', '--run_type', type = str, required = False)
+        parser.add_argument('-n', '--run_number', type = int, required = False)
         args = parser.parse_args()
-        main(args.rows, args.cols, args.pieces, args.white_heuristic, args.black_heuristic)
-        
+        if args.run_type == 'test':
+            run_test(args.rows, args.cols, args.pieces, args.white_heuristic,
+                     args.black_heuristic, args.run_number)
+        else:
+            main(args.rows, args.cols, args.pieces, args.white_heuristic, args.black_heuristic)
