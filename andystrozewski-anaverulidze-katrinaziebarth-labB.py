@@ -121,6 +121,7 @@ def utility_conqueror(boardState, board, player):
             numOppPieces += 1
     return 0 - numOppPieces + random.random()
         
+        
 def utility_defensive(boardState, board, player):
 #average of squares until opponent reaches our edge
 #number of pieces we have left
@@ -139,7 +140,10 @@ def utility_defensive(boardState, board, player):
             numOpPieces += 1
             distance = abs(key[0] - edge)
             totalSquares += distance
-    averageSquares = totalSquares/numOpPieces
+    try:
+        averageSquares = totalSquares/numOpPieces
+    except ZeroDivisionError:
+        averageSquares = float('inf')
     return (numPieces + random.random() + averageSquares)
 
 def utility_offensive(boardState, board, player):
@@ -160,8 +164,11 @@ def utility_offensive(boardState, board, player):
             numPieces += 1
             distance = abs(key[0] - edge)
             totalSquares += distance
-    averageSquares = totalSquares/numPieces
-    return (0 -numPieces - random.random() - averageSquares)
+    try:
+        averageSquares = totalSquares/numPieces
+    except ZeroDivisionError:
+        averageSquares = float('inf')
+    return (0 - numOpPieces - random.random() - averageSquares)
 
 def get_utility(utility, boardState, board, player):
     if utility == 'evasive':
