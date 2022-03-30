@@ -138,7 +138,7 @@ class Node:
 def recursive_traversal(root, maxDepth):
     if not root.utility:
         if root.depth % 2 == 0:
-            maxValue = 0
+            maxValue = -(float('inf'))
             for child in root.children:
                 childUtility = recursive_traversal(child, maxDepth)
                 #print(root.depth + 1)
@@ -174,7 +174,7 @@ def return_desirable_move(boardState, board, utility, player):
             newState = transition(currNode.boardState, player, move)
             newNode = Node(move, newState, currDepth+1)
             currNode.children.append(newNode)
-            if newNode.depth == maxDepth:
+            if newNode.depth == maxDepth or isTerminal(newNode.boardState, board):
                 newNode.utility = get_utility(utility, newNode.boardState, board, player)
             else:
                 stack.append(newNode)
