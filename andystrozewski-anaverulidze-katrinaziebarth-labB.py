@@ -190,7 +190,7 @@ def return_desirable_move(boardState, board, utility, player):
             action = child.action
     return action
 
-def play_game(heuristicX, heuristicO, boardState, board):
+def play_game(heuristicO, heuristicX, boardState, board):
     total_moves = 0
     while not isTerminal(boardState, board):
         nextMoveO = return_desirable_move(boardState, board, heuristicO, "O")
@@ -211,14 +211,14 @@ def play_game(heuristicX, heuristicO, boardState, board):
             x_pieces += 1
         else:
             o_pieces += 1
-    print("Number of X Pieces Captured: " + str(original_count - x_pieces))
-    print("Number of O Pieces Captured: " + str(original_count - o_pieces))
+    print("Number of White Pieces Captured (O): " + str(original_count - o_pieces))
+    print("Number of Black Pieces Captured (X): " + str(original_count - x_pieces))
     
     
     
-def main(numRows, numCols, pieces, x_heuristic, o_heuristic):
+def main(numRows, numCols, pieces, o_heuristic, x_heuristic):
     state, board = initial_state_and_board(numRows, numCols, pieces)
-    play_game(x_heuristic, o_heuristic, state, board)
+    play_game(o_heuristic, x_heuristic, state, board)
     """
     display_state(state)
     piecesFile = open("currentState.txt", 'r')
