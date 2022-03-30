@@ -114,7 +114,7 @@ def utility_evasive(boardState, board, player):
             numPieces += 1
     return numPieces + random.random()
 
-def utility_conquerer(boardState, board, player):
+def utility_conqueror(boardState, board, player):
     numOppPieces = 0
     for value in boardState.pieceLocations.values():
         if value != player:
@@ -166,12 +166,14 @@ def utility_offensive(boardState, board, player):
 def get_utility(utility, boardState, board, player):
     if utility == 'evasive':
         return utility_evasive(boardState, board, player)
-    elif utility == 'conquerer':
-        return utility_conquerer(boardState, board, player)
+    elif utility == 'conqueror':
+        return utility_conqueror(boardState, board, player)
     elif utility == 'defensive':
         return utility_defensive(boardState, board, player)
     elif utility == 'offensive':
         return utility_offensive(boardState, board, player)
+    else:
+        raise ValueError(utility + " is not a valid heuristic") 
     
 class Node:
     def __init__(self, action, boardState, depth):
