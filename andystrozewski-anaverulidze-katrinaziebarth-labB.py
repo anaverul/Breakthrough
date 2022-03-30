@@ -121,12 +121,58 @@ def utility_conquerer(boardState, board, player):
             numOppPieces += 1
     return 0 - numOppPieces + random.random()
 
+def utility_defensive(boardState, board, player):
+#average of squares until opponent reaches our edge
+#number of pieces we have left
+#we want both of these values to be high, that's why we consider them together
+    numPieces = 0
+    numSquares = 0
+    totalSquares = 0
+    if player == "X":
+        edge = 0
+    else:
+        edge= board.getNumRows()-1
+    for key, value in boardState.getPieceLocations().items():
+        if value == player:
+            numPieces += 1
+        else:
+            distance = abs(key[0] - edge)
+            numSquares += 1
+            totalSquares += distance
+    averageSquares = totalSquares/numSquares
+    return (numPieces + random.random() + averageSquares)
+
+def utility_offensive(boardState, board, player):
+#average of squares until we reach opponent's edge
+#number of pieces our opponent has left
+#we want both of these values to be low, that's why we consider them together
+    numPieces = 0
+    numSquares = 0
+    totalSquares = 0
+    if player == "X":
+        edge = board.getNumRows()-1
+    else:
+        edge= 0
+    for key, value in boardState.getPieceLocations().items():
+        if value != player:
+            numPieces += 1
+        else:
+            distance = abs(key[0] - edge)
+            numSquares += 1
+            totalSquares += distance
+    averageSquares = totalSquares/numSquares
+    return (0 -numPieces - random.random() - averageSquares)
+
 def get_utility(utility, boardState, board, player):
     if utility == 'evasive':
         return utility_evasive(boardState, board, player)
     elif utility == 'conquerer':
         return utility_conquerer(boardState, board, player)
-
+    elif utility == 'defensive':
+        return utility_defensive(boardState, board, player)
+    elif utility == 'offensive':
+        return utility_offensive(boardState, board, player)
+    
 class Node:
     def __init__(self, action, boardState, depth):
         self.children = []
