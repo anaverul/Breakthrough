@@ -107,6 +107,14 @@ def isTerminal(boardState, board):
                 terminal = True
     return terminal    
 
+def checkVictor(boardState, board):
+    for key, value in boardState.pieceLocations.items():
+        if value == "X" and key[0] == board.getNumRows()-1:
+                return "X"
+        else:
+            if value == "O" and key[0] == 0:
+                return "O"
+
 def utility_evasive(boardState, board, player):
     numPieces = 0
     for value in boardState.pieceLocations.values():
@@ -257,6 +265,11 @@ def play_game(heuristicO, heuristicX, boardState, board):
         boardState = transition(boardState, "X", nextMoveX)    
         total_moves += 1
     display_state(boardState, board)
+    victor = checkVictor(boardState, board)
+    if victor == "X":
+        print("Black (X) was the winner.")
+    else:
+        print("White (O) was the winner.")
     print("Total moves: " + str(total_moves))
     original_count = board.cols * board.pieceRows
     x_pieces = 0
@@ -268,6 +281,7 @@ def play_game(heuristicO, heuristicX, boardState, board):
             o_pieces += 1
     print("Number of White Pieces Captured (O): " + str(original_count - o_pieces))
     print("Number of Black Pieces Captured (X): " + str(original_count - x_pieces))
+    return victor, total_moves, original_count - o_pieces, original_count - x_pieces
     
 def main(numRows, numCols, pieces, o_heuristic, x_heuristic):
     state, board = initial_state_and_board(numRows, numCols, pieces)
@@ -275,11 +289,17 @@ def main(numRows, numCols, pieces, o_heuristic, x_heuristic):
 
 def run_test(numRows, numCols, pieces, o_heuristic, x_heuristic, run_number):
     state, board = initial_state_and_board(numRows, numCols, pieces)
+    o_vict = 0
+    x_vict = 0
     moves = 0
     w_count = 0
     b_count = 0
     for i in range(run_number):
-        total_moves, w_captured, b_captured = play_game(o_heuristic, x_heuristic, state, board)
+        victor, total_moves, w_captured, b_captured = play_game(o_heuristic, x_heuristic, state, board)
+        if victor == "O":
+            o_vict += 1
+        else:
+            x_vict += 1
         moves += total_moves
         w_count += w_captured
         b_count += b_captured
@@ -292,6 +312,9 @@ def run_test(numRows, numCols, pieces, o_heuristic, x_heuristic, run_number):
         statsFile.write(str(board.cols) + " x " + str(board.rows) + ", " + str(board.pieceRows) + " rows of pieces")
     else:
         statsFile.write(str(board.cols) + " x " + str(board.rows) + ", " + str(board.pieceRows) + " row of pieces")
+    print("White victories: " + str(o_vict))
+    print("Black victories: " + str(x_vict))
+    print("Total games: " + str(run_number))
     statsFile.write("Average Total Moves: " + str(moves / run_number))
     statsFile.write("Average Number of White Pieces Captured: " + str(w_count / run_number))
     statsFile.write("Average Number of Black Pieces Captured: " + str(b_count / run_number))
