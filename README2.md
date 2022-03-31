@@ -5,6 +5,7 @@ Implementation of utility functions for the agents competing in a game of Breakt
 
 * **os**
 * **random**
+* **copy**
 
 ## How to use:
 
