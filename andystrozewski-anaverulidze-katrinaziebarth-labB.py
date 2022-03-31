@@ -152,7 +152,7 @@ def utility_defensive(boardState, board, player):
         averageSquares = totalSquares/numOpPieces
     except ZeroDivisionError:
         averageSquares = float('inf')
-    return (numPieces + random.random() + averageSquares)
+    return (averageSquares*2 + (numPieces*3 - (numOpPieces + random.random())))
 
 def utility_offensive(boardState, board, player):
 #average of squares until we reach opponent's edge
