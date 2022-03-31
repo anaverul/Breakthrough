@@ -14,7 +14,7 @@ class Board:
         self.cols = cols
         self.pieceRows = pieces
         self.emptyRows = rows - 2 * pieces
-        
+
     def getNumRows(self):
         return self.rows
     def getNumCols(self):
@@ -25,7 +25,7 @@ class State:
         self.pieceLocations = pieceLocations
     def getPieceLocations(self):
         return self.pieceLocations
-    
+
 def initial_state_and_board(numRows, numCols, pieceRows): #pieceRows is an integer representing the number of rows each player has
     board = Board(numRows, numCols, pieceRows)
     locationDict = {}
@@ -37,7 +37,7 @@ def initial_state_and_board(numRows, numCols, pieceRows): #pieceRows is an integ
             locationDict[(i, j)] = "O"
     state = State(locationDict)
     return state, board
-    
+
 def display_state(inputState, board):
     if os.path.isfile("currentState.txt"):
         os.remove("currentState.txt")
@@ -79,9 +79,9 @@ def generate_moves(currState, board, player):  #revised code
                     possibleMoves.append((p, "FW"))
             else:
                 if currState.pieceLocations[(newrow, p[1]-1)] != player:
-                    possibleMoves.append((p, "FW"))       
+                    possibleMoves.append((p, "FW"))
     return possibleMoves
-    
+
 def transition(currState, player, move):
     newLocations = copy.deepcopy(currState.pieceLocations)
     if player == "X":
@@ -105,7 +105,7 @@ def isTerminal(boardState, board):
         else:
             if value == "O" and key[0] == 0:
                 terminal = True
-    return terminal    
+    return terminal
 
 def checkVictor(boardState, board):
     for key, value in boardState.pieceLocations.items():
@@ -128,8 +128,8 @@ def utility_conqueror(boardState, board, player):
         if value != player:
             numOppPieces += 1
     return 0 - numOppPieces + random.random()
-        
-        
+
+
 def utility_defensive(boardState, board, player):
 #average of squares until opponent reaches our edge
 #number of pieces we have left
@@ -176,7 +176,7 @@ def utility_offensive(boardState, board, player):
         averageSquares = totalSquares/numPieces
     except ZeroDivisionError:
         averageSquares = float('inf')
-    return (0 - numOpPieces - random.random() - averageSquares)
+    return (averageSquares*2 - (numOpPieces*3 - (numPieces + random.random())))
 
 def get_utility(utility, boardState, board, player):
     if utility == 'evasive':
@@ -188,8 +188,8 @@ def get_utility(utility, boardState, board, player):
     elif utility == 'offensive':
         return utility_offensive(boardState, board, player)
     else:
-        raise ValueError(utility + " is not a valid heuristic") 
-    
+        raise ValueError(utility + " is not a valid heuristic")
+
 class Node:
     def __init__(self, action, boardState, depth):
         self.children = []
@@ -222,7 +222,7 @@ def recursive_traversal(root, maxDepth):
                     #print("MinValue: " + str(minValue))
             root.utility = minValue
     return root.utility
-                    
+
 def return_desirable_move(boardState, board, utility, player):
     currDepth = 0
     maxDepth = 4
@@ -265,7 +265,7 @@ def play_game(heuristicO, heuristicX, boardState, board):
             break
         nextMoveX = return_desirable_move(boardState, board, heuristicX, "X")
         if nextMoveX:
-            boardState = transition(boardState, "X", nextMoveX)    
+            boardState = transition(boardState, "X", nextMoveX)
         total_moves += 1
     display_state(boardState, board)
     victor = checkVictor(boardState, board)
@@ -285,7 +285,7 @@ def play_game(heuristicO, heuristicX, boardState, board):
     print("Number of White Pieces Captured (O): " + str(original_count - o_pieces))
     print("Number of Black Pieces Captured (X): " + str(original_count - x_pieces))
     return victor, total_moves, original_count - o_pieces, original_count - x_pieces
-    
+
 def main(numRows, numCols, pieces, o_heuristic, x_heuristic):
     state, board = initial_state_and_board(numRows, numCols, pieces)
     play_game(o_heuristic, x_heuristic, state, board)
@@ -325,7 +325,7 @@ def run_test(numRows, numCols, pieces, o_heuristic, x_heuristic, run_number):
     statsFile = open("statistics.txt", 'r')
     print(statsFile.read(), end="")
     statsFile.close()
-        
+
 if __name__ == "__main__":
         import argparse
         parser = argparse.ArgumentParser(description='Breakthrough')
@@ -342,3 +342,4 @@ if __name__ == "__main__":
                      args.black_heuristic, args.run_number)
         else:
             main(args.rows, args.cols, args.pieces, args.white_heuristic, args.black_heuristic)
+
