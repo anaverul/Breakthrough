@@ -325,6 +325,40 @@ def run_test(numRows, numCols, pieces, o_heuristic, x_heuristic, run_number):
     print(statsFile.read(), end="")
     statsFile.close()
 
+def step_by_step(heuristicO, heuristicX, boardState, board):
+    total_moves = 0
+    while not isTerminal(boardState, board):
+        nextMoveO = return_desirable_move(boardState, board, heuristicO, "O")
+        if nextMoveO:
+            boardState = transition(boardState, "O", nextMoveO)
+            display_state(boardState, board)
+        total_moves += 1
+        if isTerminal(boardState, board):
+            break
+        nextMoveX = return_desirable_move(boardState, board, heuristicX, "X")
+        if nextMoveX:
+            boardState = transition(boardState, "X", nextMoveX)  
+            display_state(boardState, board)
+        total_moves += 1
+    victor = checkVictor(boardState, board)
+    if victor == "X":
+        print("Black (X) was the winner.")
+    else:
+        print("White (O) was the winner.")
+    print("Total moves: " + str(total_moves))
+    original_count = board.cols * board.pieceRows
+    x_pieces = 0
+    o_pieces = 0
+    for key, value in boardState.getPieceLocations().items():
+        if value == 'X':
+            x_pieces += 1
+        else:
+            o_pieces += 1
+    print("Number of White Pieces Captured (O): " + str(original_count - o_pieces))
+    print("Number of Black Pieces Captured (X): " + str(original_count - x_pieces))
+    return victor, total_moves, original_count - o_pieces, original_count - x_pieces
+    
+        
 if __name__ == "__main__":
         import argparse
         parser = argparse.ArgumentParser(description='Breakthrough')
@@ -339,6 +373,8 @@ if __name__ == "__main__":
         if args.run_type == 'test':
             run_test(args.rows, args.cols, args.pieces, args.white_heuristic,
                      args.black_heuristic, args.run_number)
+        elif args.run_type == 'steps':
+            state, board = initial_state_and_board(args.rows, args.cols, args.pieces)
+            step_by_step(args.white_heuristic, args.black_heuristic, state, board)
         else:
             main(args.rows, args.cols, args.pieces, args.white_heuristic, args.black_heuristic)
-
