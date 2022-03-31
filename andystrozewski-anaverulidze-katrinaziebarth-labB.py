@@ -6,6 +6,7 @@ andystrozewski-anaverulidze-katrinaziebarth-labB.py
 
 import os
 import random
+import copy
 
 class Board:
     def __init__(self, rows, cols, pieces):
@@ -82,7 +83,7 @@ def generate_moves(currState, board, player):  #revised code
     return possibleMoves
 
 def transition(currState, player, move):
-    newLocations = copy(currState.pieceLocations)
+    newLocations = copy.copy(currState.pieceLocations)
     if player == "X":
         newrow = move[0][0]+1 #movement will be south by one row
     else: #if player is O
